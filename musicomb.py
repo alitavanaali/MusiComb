@@ -1,7 +1,7 @@
 import itertools
 from collections import defaultdict, namedtuple
 from typing import Dict, List
-
+import random
 import yaml
 from ortools.sat.python import cp_model
 
@@ -66,16 +66,16 @@ class MusiComb():
         chorus_end = int(self.music_length * 0.8)
 
         # solver has to find the capacity for each section in ranges we define
-        intro_capacity = self.model.NewIntVar(2, 4, 'intro_capacity')
-        vers_capacity = self.model.NewIntVar(4, 6, 'verse_capacity')
+        intro_capacity = self.model.NewIntVar(4, 5, 'intro_capacity')
+        vers_capacity = self.model.NewIntVar(5, 6, 'verse_capacity')
         chorus_capacity = self.model.NewIntVar(6, 8, 'chorus_capacity')
         ending_capacity = self.model.NewIntVar(1, 3, 'ending_capacity')
 
         # manually we set demands of each role for each section, demands will affect
         # how solver will select roles to play
-        intro_demands = {'main_melody': 3, 'riff': 3, 'accompaniment': 2, 'sub_melody': 2, 'pad': 2, 'bass': 1, 'drum': 0}
-        vers_demands = {'main_melody': 3, 'riff': 3, 'accompaniment': 2, 'sub_melody': 2, 'pad': 2, 'bass': 1, 'drum': 0}
-        chorus_demands = {'main_melody': 2, 'riff': 2, 'accompaniment': 2, 'sub_melody': 2, 'pad': 2, 'bass': 1, 'drum': 0}
+        intro_demands = {'main_melody': 3, 'riff': 3, 'accompaniment': 2, 'sub_melody': 2, 'pad': 2, 'bass': 1, 'drum': 1}
+        vers_demands = {'main_melody': 3, 'riff': 3, 'accompaniment': 2, 'sub_melody': 2, 'pad': 2, 'bass': 1, 'drum': 1}
+        chorus_demands = {'main_melody': 2, 'riff': 2, 'accompaniment': 2, 'sub_melody': 2, 'pad': 2, 'bass': 1, 'drum': 1}
         ending_demands = {'main_melody': 2, 'riff': 2, 'accompaniment': 2, 'sub_melody': 1, 'pad': 2, 'bass': 1, 'drum': 1}
 
         for role, durations in role_to_durations.items():
@@ -104,8 +104,12 @@ class MusiComb():
                             else:
                                 role_to_intervals_ending[suffix].append(interval_opt_)
 
+                            if role == 'drum':
+                                if random.randint(0, 9) >= 2: # for 80% drum is should be available
+                                    is_present_opt = 1
 
                             self.role_to_repeats[suffix].append(is_present_opt)
+
 
 
         intervals_intro = [interval for intervals in role_to_intervals_intro.values() for interval in intervals]
