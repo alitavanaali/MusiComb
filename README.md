@@ -56,28 +56,20 @@ Run `app.py` with its required arguments, e.g.
 ```
 $ python app.py
 ```
-Then you can open [127](http://127.0.0.1:5000) in your browser to open the user interface of the application.
+Then you can open [[127](http://127.0.0.1:5000)](http://127.0.0.1:5000) in your browser to open the user interface of the application.
 
+![Screenshot](Screenshot 2023-11-26 at 16.48.50.png)
 
-The above command produces a musical composition by combining samples from the dataset. If you want to combine new, generated samples instead, just add the `--generate_samples` flag, e.g.
-```
-$ python generate.py \
---bpm 130 \
---key aminor \
---time_signature 4/4 \
---num_measures 8 \
---genre newage \
---rhythm standard \
---chord_progression Am-F-C-G-Am-F-C-G \
---generate_samples
-```
-**Note:** the above command runs either on CPU or on a single GPU. The available device will be detected automatically.
+Once the program successfully terminates you will see screen below:
 
-Once the program successfully terminates, you will find an `out` directory with the following structure:
+![Screenshot](Screenshot 2023-11-26 at 16.55.12.png)
+
+and then, you will find an `out` directory with the following structure:
 ```
 out
 └── <date>_<time>
     ├── metadata.yaml
     └── tune.mid
+    └── tune_notmerged_sounds.mid
 ```
-where `metadata.yaml` contains the arguments of the corresponding run and `tune.mid` is the generated MIDI file.
+where `metadata.yaml` contains the arguments of the corresponding run and `tune.mid` is the generated MIDI file and 'tune_notmerged_sounds.mid' is separated tracks version.
