@@ -20,11 +20,17 @@ MusiComb is a program born as an extension of Hyun et al., 2022 ([paper](https:/
 1. Unzip the dataset:
     ```
     $ tar -xvf dataset/commu_midi.tar -C dataset/
+    $ unzip dataset/groove_drum.zip -d dataset/
     ```
     You should get the following directory structure:
     ```
     dataset
     ├── commu_meta.csv
+    ├── groove_drum
+    │   ├── drummer1
+    │   ├── drummer2
+    │   ├── ...
+    │   ├── drummer10
     ├── commu_midi
     │   ├── train
     │   │   └── raw
@@ -46,18 +52,12 @@ MusiComb is a program born as an extension of Hyun et al., 2022 ([paper](https:/
 
 ## Run
 
-Run `generate.py` with its required arguments, e.g.
+Run `app.py` with its required arguments, e.g.
 ```
-$ python generate.py \
---bpm 130 \
---key aminor \
---time_signature 4/4 \
---num_measures 8 \
---genre newage \
---rhythm standard \
---chord_progression Am-F-C-G-Am-F-C-G
+$ python app.py
 ```
-You can find a list of legal values for each argument [here](cfg/metadata.yaml).
+Then you can open [127](http://127.0.0.1:5000) in your browser to open the user interface of the application.
+
 
 The above command produces a musical composition by combining samples from the dataset. If you want to combine new, generated samples instead, just add the `--generate_samples` flag, e.g.
 ```
