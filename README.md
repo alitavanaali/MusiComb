@@ -60,6 +60,7 @@ Then you can open [[127](http://127.0.0.1:5000)](http://127.0.0.1:5000) in your 
 
 [Screenshot](sc1.png)
 ![Optional Text](..Screenshot 2023-11-26 at 16.48.50.png)
+![Screenshot 2023-11-26 at 16.48.50](sc1.png)
 
 Once the program successfully terminates you will see screen below:
 
