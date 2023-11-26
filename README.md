@@ -6,7 +6,7 @@ MusiComb is a program born as an extension of Hyun et al., 2022 ([paper](https:/
 
 1. Clone the repo and `cd` into its directory:
     ```
-    $ git clone https://github.com/frallebini/midicomb.git
+    $ git clone https://github.com/alitavanaali/musicomb.git
     $ cd midicomb
     ```
 
@@ -16,7 +16,6 @@ MusiComb is a program born as an extension of Hyun et al., 2022 ([paper](https:/
     $ source .venv/bin/activate
     $ pip install -r requirements.txt
     ```
-    **Note:** the code has been tested with Python `3.8.5`
 
 1. Unzip the dataset:
     ```
