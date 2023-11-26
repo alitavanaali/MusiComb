@@ -56,7 +56,7 @@ Run `app.py` with its required arguments, e.g.
 ```
 $ python app.py
 ```
-Then you can open [[127](http://127.0.0.1:5000)](http://127.0.0.1:5000) in your browser to open the user interface of the application.
+Then you can open [http://127.0.0.1:5000](http://127.0.0.1:5000) in your browser to open the user interface of the application.
 
 ![Screenshot 2023-11-26 at 16.48.50](sc1.png)
 
