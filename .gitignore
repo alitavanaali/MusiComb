@@ -7,3 +7,4 @@ out
 tutorial
 checkpoint_best.pt
 explore_dset.ipynb
+/dataset/groove_drum/

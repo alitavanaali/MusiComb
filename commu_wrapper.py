@@ -8,7 +8,8 @@ from tqdm import tqdm
 from commu.midi_generator.generate_pipeline import MidiGenerationPipeline
 from commu_dset import DSET
 from commu_file import CommuFile
-
+from itertools import chain
+import random
 
 def make_midis(
         bpm: int,
@@ -21,10 +22,11 @@ def make_midis(
         timestamp: str) -> Dict[str, List[CommuFile]]:
     with open('cfg/inference.yaml') as f:
         cfg = yaml.safe_load(f)
-
     role_to_midis = defaultdict(list)
-     
-    for role in tqdm(DSET.get_track_roles()):
+    valid_roles = DSET.get_track_roles()
+    valid_roles.remove('drum')
+    drum_dict = DSET.get_drum(genre, time_signature, num_measures)
+    for role in tqdm(valid_roles):
 
         pipeline = MidiGenerationPipeline({'checkpoint_dir': 'ckpt/checkpoint_best.pt'})
 
@@ -33,6 +35,9 @@ def make_midis(
     
         min_v, max_v = DSET.sample_min_max_velocity(role)
         instrument = DSET.sample_instrument(role)
+        if genre not in ['cinematic', 'newage']:
+            genre = 'newage'
+
         encoded_meta = pipeline.preprocess_task.excecute({
             'track_role': role,
 
@@ -67,4 +72,5 @@ def make_midis(
         role_to_midis[role].append(CommuFile(filepath, role, instrument))
         Path(filepath).unlink()
 
-    return role_to_midis
+    merged = dict(chain(role_to_midis.items(), drum_dict.items()))
+    return merged

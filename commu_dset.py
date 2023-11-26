@@ -7,14 +7,15 @@ from typing import Any, Dict, List, Tuple
 
 import pandas as pd
 import yaml
-
+import itertools
 from commu_file import CommuFile
 
 
 class CommuDataset:
 
     def __init__(self) -> None:
-        self.df = pd.read_csv('dataset/commu_meta.csv')
+        #self.df = pd.read_csv('dataset/commu_meta.csv')
+        self.df = pd.read_csv('dataset/concatenated_df.csv', sep='\t')
         self._preprocess()
 
         with open('cfg/chord_progressions.yaml') as f:
@@ -22,6 +23,54 @@ class CommuDataset:
 
     def get_track_roles(self) -> List[str]:
         return self.df.track_role.unique().tolist()
+
+    def get_drum(self, genre, time_signature, num_measures):
+        """
+        This function will retrieve from database a drum midi track in a dictionary
+        to apply the query we need genre, time_signature, num_measures
+
+        because in Groove midi drum database, there is no track of genres: cinematic, newage
+        so first we check the input genre, if it's one them we change it to rock which is the
+        most populated genre in database
+        """
+        genre = 'rock' if genre in ['cinematic', 'newage'] else genre
+
+        df_drum = self.df[
+            (self.df.track_role == 'drum') &
+            (self.df.genre == genre) &
+            (self.df.beat_type == 'beat') &
+            (self.df.time_signature == time_signature) &
+            (self.df.num_measures == num_measures)
+            ]
+
+        if df_drum.empty:
+                print('No sample satifies the drum with current number of measures. Searching for higher measures...')
+
+                df_drum = self.df[
+                    (self.df.track_role == 'drum') &
+                    (self.df.genre == genre) &
+                    (self.df.beat_type == 'beat') &
+                    (self.df.time_signature == time_signature)
+                    & (self.df.num_measures > num_measures)
+                    ]
+                if df_drum.empty:
+                    raise ValueError('No Drum Found!')
+
+        # make a sample to dataframe
+        df_drum = df_drum.sample()
+
+        role_to_midis = defaultdict(list)
+
+        for i in df_drum.index:
+            sample = df_drum[df_drum.index == i]
+            role = sample.track_role.item()
+            name = f'{role}_{i}'
+            midi = CommuFile(
+                    f'dataset/groove_drum/{sample.id.item()}',
+                    name,
+                    sample.instrument.item())
+            role_to_midis[role].append(midi)
+        return role_to_midis
 
     def sample_midis(
             self,
@@ -40,11 +89,11 @@ class CommuDataset:
             genre,
             rhythm,
             chord_progression)
+
         
-        valid_roles = set(df_samples.track_role.unique()) - {'riff'}  # we do not want more than one riff
+        valid_roles = set(df_samples.track_role.unique())
         midi_count = len(df_samples)
         indexes = df_samples.index.tolist()
-
         while midi_count < len(self.get_track_roles()):
             try:
                 role = random.choice(list(valid_roles))
@@ -54,9 +103,7 @@ class CommuDataset:
                     key,
                     time_signature,
                     num_measures,
-                    genre,
-                    rhythm,
-                    chord_progression)
+                    rhythm)
             except IndexError:  # no more valid track roles
                 break
             except ValueError:  # no sample satifies the query
@@ -76,10 +123,16 @@ class CommuDataset:
             sample = df_samples[df_samples.index == i]
             role = sample.track_role.item()
             name = f'{role}_{role_counts[role]}'
-            midi = CommuFile(
-                f'dataset/commu_midi/{sample.split.item()}/raw/{sample.id.item()}.mid',
-                name, 
-                sample.instrument.item())
+            if role != 'drum':
+                midi = CommuFile(
+                    f'dataset/commu_midi/{sample.split.item()}/raw/{sample.id.item()}.mid',
+                    name,
+                    sample.instrument.item())
+            else:
+                midi = CommuFile(
+                    f'dataset/groove_drum/{sample.id.item()}',
+                    name,
+                    sample.instrument.item())
             role_counts[role] += 1
             role_to_midis[role].append(midi)
 
@@ -124,6 +177,7 @@ class CommuDataset:
             lambda cp: str([key for key, _ in groupby(cp[2:-2].replace('\'', '').split(', '))]
                 )[1:-1].replace('\'', '').replace(', ', '-'))
 
+
     def _get_sample(
             self,
             track_role: str,
@@ -131,19 +185,17 @@ class CommuDataset:
             key: str,
             time_signature: str,
             num_measures: int,
-            genre: str,
-            rhythm: str,
-            chord_progression: str) -> pd.DataFrame:
+            rhythm: str) -> pd.DataFrame:
         return self.df[
             (self.df.track_role == track_role) &
             (self.df.bpm == bpm) &
             (self.df.key == key) &
             (self.df.time_signature == time_signature) &
             (self.df.num_measures == num_measures) &
-            (self.df.genre == genre) &
-            (self.df.rhythm == rhythm) &
-            (self.df.chord_progression == chord_progression)
+            (self.df.rhythm == rhythm)
+
         ].sample()
+
 
     def _get_sample_foreach_role(
             self,
@@ -154,26 +206,57 @@ class CommuDataset:
             genre: str,
             rhythm: str,
             chord_progression: str) -> pd.DataFrame:
+
         df_query = self.df[
+            (self.df.track_role != 'drum') &
             (self.df.bpm == bpm) &
             (self.df.key == key) &
             (self.df.time_signature == time_signature) &
             (self.df.num_measures == num_measures) &
-            (self.df.genre == genre) &
-            (self.df.rhythm == rhythm) &
-            (self.df.chord_progression == chord_progression)]
+            (self.df.rhythm == rhythm)
+            ]
+        # check optional chord_progression
+        if chord_progression != 'none':
+            df_query = df_query[df_query.chord_progression == chord_progression]
+
+        genre_for_drum = 'rock' if genre in ['cinematic', 'newage'] else genre
+        df_drum = self.df[
+            (self.df.track_role == 'drum') &
+            (self.df.genre == genre_for_drum) &
+            (self.df.beat_type == 'beat') &
+            (self.df.time_signature == time_signature) &
+            (self.df.num_measures == num_measures)
+        ]
+
+        if df_drum.empty:
+            print(f'No sample satifies the drum with {num_measures} number of measures. Searching for higher measures...')
+            df_drum = self.df[
+                (self.df.track_role == 'drum') &
+                (self.df.genre == genre_for_drum) &
+                (self.df.beat_type == 'beat') &
+                (self.df.time_signature == time_signature)
+                & (self.df.num_measures > num_measures)
+                ]
+            if df_drum.empty:
+                raise ValueError('No Drum Found!')
+
 
         if df_query.empty:
             raise ValueError(
                 'No sample satifies the given conjunction of bpm, key, time signature, ' +
                 'number of meaures, genre, rhythm, and chord progression values. ' +
                 'Please try again with different values.')
+
+        df_query = pd.concat([df_query, df_drum], ignore_index=True)
         
         samples = []
         for role in df_query.track_role.unique():
             df_role = df_query[df_query.track_role == role]
-            samples.append(df_role.sample())
-        
+            if role != 'drum':
+                samples.append(df_role.sample(2) if len(df_role) > 1 else df_role.sample())
+            else:
+                samples.append(df_role.sample() if len(df_role) > 1 else df_role.sample())
+
         return pd.concat(samples)
 
     def _preprocess(self) -> None:
@@ -197,3 +280,5 @@ class CommuDataset:
 
 
 DSET = CommuDataset()  # singleton
+
+

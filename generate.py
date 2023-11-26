@@ -7,9 +7,10 @@ import yaml
 from commu_dset import DSET
 from commu_wrapper import make_midis
 from musicomb import MusiComb
-
+import random
 
 def main(args: argparse.Namespace, timestamp: str) -> None:
+
     if args.generate_samples:
         role_to_midis = make_midis(
             args.bpm,
@@ -30,7 +31,7 @@ def main(args: argparse.Namespace, timestamp: str) -> None:
             args.rhythm,
             args.chord_progression)
 
-    MusiComb(role_to_midis, timestamp).solve()
+    MusiComb(role_to_midis, timestamp, args.bpm, args.time_signature, args.num_measures, args.genre, args.music_length).solve()
 
 
 if __name__ == '__main__':
@@ -80,6 +81,12 @@ if __name__ == '__main__':
         type=str, 
         required=True, 
         choices=meta['chord_progression'])
+    parser.add_argument(
+        '--music_length',
+        dest='music_length',
+        type=int,
+        required=True,
+        choices=meta['music_length'])
     parser.add_argument(
         '--generate_samples', 
         dest='generate_samples', 

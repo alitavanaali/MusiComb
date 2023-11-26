@@ -5,6 +5,7 @@ demands:
   sub_melody: 2
   accompaniment: 2
   pad: 1
-  bass: 1
+  bass: 3
+  drum: 1
 
 padding: 4000  # an high enough value will discourage the solver from playing any sample by itself

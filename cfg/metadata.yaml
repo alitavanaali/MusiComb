@@ -38,10 +38,31 @@ num_measures:
 genre:
   - cinematic
   - newage
+  - pop
+  - hiphop
+  - rock
+  - latin
+  - funk
+  - jazz
+  - soul
+  - afro
+  - punk
+  - country
+
 rhythm:
   - standard
   - triplet
+  - 'none'
+
+music_length:
+  - 1
+  - 2
+  - 3
+  - 4
+  - 5
+  - 10
 chord_progression:
+  - 'none'
   - Am-Am7-F-Am-Adim-Asus4-Am-A#maj7
   - C-F-Am-G-C-F-Am-G
   - C-F-C-F-Am-G-F
@@ -326,3 +347,4 @@ chord_progression:
   - Dm7-G7-Cmaj7-Am7-Dm7-G7-Cmaj7-Am7-Dm7-G7-Cmaj7-Am7-Dm7-G7-Cmaj7-Am7
   - F#m7-C#m-Dmaj7
   - Dm7-G7-Em7-A7-Dm7-G7-Cmaj7-Dm7-Em7-Fmaj7-B7-Em7-A7-Dm7-G7-C-F
+  - Am-Am-Am-Am-Am-Am-Am-Am-Am7-Am7-Am7-Am7-Am7-Am7-Am7-Am7-F-F-F-F-F-F-F-F-Am-Am-Am-Am-Am-Am-Am-Am-Adim-Adim-Adim-Adim-Adim-Adim-Adim-Adim-Asus4-Asus4-Asus4-Asus4-Asus4-Asus4-Asus4-Asus4-Am-Am-Am-Am-Am-Am-Am-Am-A#maj7-A#maj7-A#maj7-A#maj7-A#maj7-A#maj7-A#maj7-A#maj7

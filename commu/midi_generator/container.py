@@ -29,7 +29,7 @@ class TransXlInputData(MidiMeta):
         expected_result = (num_measures - (num_measures % 4)) * Fraction(time_signature) * 8
         result = len(value)
         if expected_result != result:
-            raise ValueError("num_measures not matched with chord progression length")
+            raise ValueError(f"num_measures ({num_measures}) not matched with chord progression length. Expected {expected_result} but received: {result}")
         return value
 
 
