@@ -32,7 +32,7 @@ class MusiComb():
 
     def calculate_bar_duration(self, bpm, time_signature, bar_number):
         """
-        Calculate the duration in seconds of a given bar number in a musical piece with a 4/4 time signature.
+        Calculate the duration in milliseconds of a given bar number in a musical piece with a 4/4 time signature.
 
         :param bpm: Beats per minute of the piece.
         :param time_signature: The number of beats in a bar (always 4 for 4/4 time).
@@ -62,7 +62,7 @@ class MusiComb():
         # here we define a range for each part of the music, if music is 10 minutes long then:
         # intro takes 1 minute, verse 3 minutes, chorus 4 minutes and ending 2 minutes
         intro_end = int(self.music_length * 0.1)
-        verse_end = int(self.music_length * 0.4)
+        verse_end = int(self.music_length * 0.5)
         chorus_end = int(self.music_length * 0.8)
 
         # solver has to find the capacity for each section in ranges we define
@@ -85,30 +85,30 @@ class MusiComb():
                         # depends on track length, find the maximum number of repeats for each track
                         maximum_possible_repeats = self.music_length // duration
                         for i in range(0, max(1, maximum_possible_repeats)):
-                            start_opt = self.model.NewIntVar(self.bar_duration * i, (self.bar_duration * i) + duration, f'start_opt_{suffix}_{i}')
-                            end_opt = self.model.NewIntVar(self.bar_duration * i, (self.bar_duration * i) + duration, f'end_opt_{suffix}_{i}')
+                                start_opt = self.model.NewIntVar(self.bar_duration * i, (self.bar_duration * i) + duration, f'start_opt_{suffix}_{i}')
+                                end_opt = self.model.NewIntVar(self.bar_duration * i, (self.bar_duration * i) + duration, f'end_opt_{suffix}_{i}')
 
-                            is_present_opt = self.model.NewBoolVar(f'is_present_opt_{suffix}_{i}')
-                            interval_opt_ = self.model.NewOptionalIntervalVar(
-                                start_opt, duration, end_opt,
-                                is_present_opt, f'interval_opt_{suffix}_{i}')
-                            self.role_to_tracks[suffix].append(
-                                Track(start_opt, end_opt, interval_opt_, is_present_opt))
+                                is_present_opt = self.model.NewBoolVar(f'is_present_opt_{suffix}_{i}')
+                                interval_opt_ = self.model.NewOptionalIntervalVar(
+                                    start_opt, duration, end_opt,
+                                    is_present_opt, f'interval_opt_{suffix}_{i}')
+                                self.role_to_tracks[suffix].append(
+                                    Track(start_opt, end_opt, interval_opt_, is_present_opt))
 
-                            if (duration * i) < intro_end:
-                                role_to_intervals_intro[suffix].append(interval_opt_)
-                            if intro_end < (duration * i) < verse_end:
-                                role_to_intervals_vers[suffix].append(interval_opt_)
-                            if verse_end < (duration * i) < chorus_end:
-                                role_to_intervals_chorus[suffix].append(interval_opt_)
-                            else:
-                                role_to_intervals_ending[suffix].append(interval_opt_)
+                                if (duration * i) < intro_end:
+                                    role_to_intervals_intro[suffix].append(interval_opt_)
+                                if intro_end < (duration * i) < verse_end:
+                                    role_to_intervals_vers[suffix].append(interval_opt_)
+                                if verse_end < (duration * i) < chorus_end:
+                                    role_to_intervals_chorus[suffix].append(interval_opt_)
+                                else:
+                                    role_to_intervals_ending[suffix].append(interval_opt_)
 
-                            if role == 'drum':
-                                if random.randint(0, 9) >= 2: # for 80% drum is should be available
-                                    is_present_opt = 1
+                                if role == 'drum':
+                                    if random.randint(0, 9) >= 2: # for 80% drum is should be available
+                                        is_present_opt = 1
 
-                            self.role_to_repeats[suffix].append(is_present_opt)
+                                self.role_to_repeats[suffix].append(is_present_opt)
 
 
 
