@@ -6,7 +6,7 @@ MusiComb is a program born as an extension of Hyun et al., 2022 ([paper](https:/
 
 1. Clone the repo and `cd` into its directory:
     ```
-    $ git clone https://github.com/alitavanaali/musicomb.git
+    $ git clone https://github.com/alitavanaali/MusiComb.git
     $ cd midicomb
     ```
 
